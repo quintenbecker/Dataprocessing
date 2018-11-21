@@ -1,0 +1,132 @@
+<!-- Quinten Joshua Becker 12444057,
+     LineGraph.html converts a Json datafile to a Linegraph website -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>  akjbskb </title>
+  <h1>Quinten Joshua Becker </h1>
+  <p>12444057</p>
+  <p> LineGraph.html converts a Json datafile to a Linegraph website</p>
+</head>
+<body>
+<canvas id="canvas" width = 720, height = 350 ></canvas>
+<script>
+
+  // load Json file into html browser
+  var fileName = "jsonfile.json";
+  var txtFile = new XMLHttpRequest();
+  txtFile.onreadystatechange = function() {
+    if (txtFile.readyState === 4 && txtFile.status == 200) {
+        console.log(JSON.parse(txtFile.responseText));
+        object1 = JSON.parse(txtFile.responseText);
+
+        main(object1);
+
+    }
+  }
+  txtFile.open("GET", fileName);
+  txtFile.send();
+
+  // adjust the variables to the data values and canvas values
+  xtransform = createTransform([0, 321],[50,720]);
+  ytransform = createTransform([0, 205],[0,300]);
+
+  // this function adjusts the calculated data to fit into the given canvas
+  function createTransform(domain, range){
+
+      var domain_min = domain[0]
+      var domain_max = domain[1]
+      var range_min = range[0]
+      var range_max = range[1]
+
+      // formulas to calculate the alpha and the beta
+     	var alpha = (range_max - range_min) / (domain_max - domain_min)
+      var beta = range_max - alpha * domain_max
+
+      // returns the function for the linear transformation (y= a * x + b)
+      return function(x){
+        return alpha * x + beta;
+      }
+  }
+
+  var windspeed = [];
+
+  // make variable of keys in dictionary object
+  function main(data){
+    console.log(data);
+    keys = Object.keys(object1);
+
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // make list for x-axis and apply iterated and transormed data
+    datumsLijst = []
+    keys.forEach(function(d){
+      xscreen = xtransform(d)
+      datumsLijst.push(xscreen)
+      windspeed.push((object1[d]["Windspeed (in 0.1 m/s)"]));
+    })
+
+    // make list for y-axis and apply iterated and transormed data
+    windLijst = []
+    windspeed.forEach(function(i){
+      yscreen = ytransform(i)
+      windLijst.push(yscreen)
+    })
+    ctx.beginPath()
+    ctx.moveTo(50,ytransform[0])
+
+    // make graph with line between given transformed data
+    for (var i = 1; i < 321; i++) {
+      console.log((windLijst[i]));
+      ctx.lineTo(xtransform(i),ytransform(windLijst[i]));
+
+    }
+    ctx.stroke();
+
+    makeAxes();
+
+  // create text and axes in canvas
+  function makeAxes(){
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // insert text
+    ctx.font="20px Georgia";
+    ctx.fillText("Wind Velocity in 0.1m/s from 01.2018 - 11.2018", 300, 25)
+
+    ctx.font="10px Georgia";
+    ctx.fillText("150", 0, 10)
+
+    ctx.font="10px Georgia";
+    ctx.fillText("100", 0, 100)
+
+    ctx.font="10px Georgia";
+    ctx.fillText("50", 0, 200)
+
+    ctx.font="10px Georgia";
+    ctx.fillText("0", 0, 300)
+
+    // insert axes
+    ctx.beginPath();
+    ctx.moveTo(50, 0);
+    ctx.lineTo(50, 300);
+    ctx.moveTo(50, 300);
+    ctx.lineTo(720, 300);
+    ctx.moveTo(30, 300);
+    ctx.lineTo(720, 300);
+    ctx.moveTo(30, 200);
+    ctx.lineTo(720, 200);
+    ctx.moveTo(30, 100);
+    ctx.lineTo(720, 100);
+    ctx.moveTo(30, 0);
+    ctx.lineTo(720, 0);
+
+  }
+  ctx.stroke();
+  }
+
+</script>
+</body>
+</html>
