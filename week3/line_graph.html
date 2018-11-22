@@ -30,7 +30,7 @@
 
   // adjust the variables to the data values and canvas values
   xtransform = createTransform([0, 321],[50,720]);
-  ytransform = createTransform([0, 205],[0,300]);
+  ytransform = createTransform([0, 150],[300,0]);
 
   // this function adjusts the calculated data to fit into the given canvas
   function createTransform(domain, range){
@@ -69,18 +69,22 @@
     })
 
     // make list for y-axis and apply iterated and transormed data
+    console.log(windspeed);
     windLijst = []
     windspeed.forEach(function(i){
+      console.log(i);
+      console.log(ytransform(i));
       yscreen = ytransform(i)
       windLijst.push(yscreen)
     })
     ctx.beginPath()
-    ctx.moveTo(50,ytransform[0])
+    console.log(ytransform[0]);
+    ctx.moveTo(50,windLijst[0])
 
     // make graph with line between given transformed data
     for (var i = 1; i < 321; i++) {
       console.log((windLijst[i]));
-      ctx.lineTo(xtransform(i),ytransform(windLijst[i]));
+      ctx.lineTo(xtransform(i),windLijst[i]);
 
     }
     ctx.stroke();
