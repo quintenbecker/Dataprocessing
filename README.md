@@ -2,7 +2,9 @@
 
 In this folder you can open my homework assignments for eacht week
 
-My Html Website:
+Link for Javascript Html Website:
+
+https://quintenbecker.github.io.Dataprocessing/week3/line_graph.html
 
 
 
