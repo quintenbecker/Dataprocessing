@@ -54,7 +54,6 @@
 
   // make variable of keys in dictionary object
   function main(data){
-    console.log(data);
     keys = Object.keys(object1);
 
     var canvas = document.getElementById('canvas');
@@ -69,21 +68,16 @@
     })
 
     // make list for y-axis and apply iterated and transormed data
-    console.log(windspeed);
     windLijst = []
     windspeed.forEach(function(i){
-      console.log(i);
-      console.log(ytransform(i));
       yscreen = ytransform(i)
       windLijst.push(yscreen)
     })
     ctx.beginPath()
-    console.log(ytransform[0]);
     ctx.moveTo(50,windLijst[0])
 
     // make graph with line between given transformed data
     for (var i = 1; i < 321; i++) {
-      console.log((windLijst[i]));
       ctx.lineTo(xtransform(i),windLijst[i]);
 
     }
