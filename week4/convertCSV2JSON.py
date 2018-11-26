@@ -4,11 +4,11 @@ import json
 with open("working_pop.csv", 'r') as csv_file:
     file = csv.DictReader(csv_file)
 
-    json_dict = {}
+    json_list = []
 
     for row in file:
-        if row["LOCATION"] == "NLD":
-            json_dict[row["TIME"]] = row["Value"]
+        if row["TIME"] == "2000":
+            json_list.append({"country": row["LOCATION"], "value": row["Value"]})
 
 with open('jsonfile.json', 'w') as f:
-    json.dump(json_dict, f)
+    json.dump(json_list, f)

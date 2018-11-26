@@ -1,8 +1,43 @@
 <!DOCTYPE html>
-<html>
-  <head>
-  </head>
-  <body>
-    <!-- This is where your bar chart will go -->
-  </body>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <script type="text/jscript" src="d3/d3.js">
+        </script>
+        <style type="text/css">
+
+          div.bar {
+          display: inline-block;
+          width: 10px;
+          height: 150px;
+          margin-right: 2px;
+          background-color: teal;
+          }
+
+        </style>
+    </head>
+    <body>
+        <script type="text/jscript">
+                  d3.select("head").append("title").text("Data visualization");
+                  d3.select("body").append("h1").text("Educational rate");
+                  d3.select("body").append("p").text("Quinten Beker, 12444057");
+
+
+                  d3.json("jsonfile.json").then(function(data)
+                  {
+                    console.log(data);
+                    d3.select("body").selectAll("div")
+                    .data(data)
+                    .enter()
+                    .append("div")
+                    .attr("class", "bar")
+                    .style("height", function(d) {
+                      var barHeight = d.value * 2
+                      console.log(d.value);
+                    return barHeight + "px";
+                  });
+                  });
+
+        </script>
+    </body>
 </html>
