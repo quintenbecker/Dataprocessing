@@ -1,14 +1,14 @@
 import csv
 import json
 
-json_dict = {}
-
-with open("graduation_data.csv") as csv_file:
+with open("working_pop.csv", 'r') as csv_file:
     file = csv.DictReader(csv_file)
 
-    for row in file:
-        print(row[0])
-        #     json_dict[row[0]] = {"Time": row[5].lstrip(), "Value": row[6].lstrip()
+    json_dict = {}
 
-# with open('jsonfile.json', 'w') as f:
-#     json.dump(json_dict, f)
+    for row in file:
+        if row["LOCATION"] == "NLD":
+            json_dict[row["TIME"]] = row["Value"]
+
+with open('jsonfile.json', 'w') as f:
+    json.dump(json_dict, f)
