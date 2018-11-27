@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8">
         <script type="text/jscript" src="d3/d3.js">
-        <script src="d3-tip.js">
-        <script src="https://d3js.org/d3.v4.js">
+        </script> -->
+        <script src="d3/d3-tip.js">
         </script>
         <style type="text/css">
         </style>
@@ -29,7 +29,7 @@
                   var tool_tip = d3.tip()
                        .attr("class", "d3-tip")
                        .offset([-8, 0])
-                       .html(function(d) { return "Radius: " + d; });
+                       .html(function(d) { return  d.country + ": " + d.value;  });
                      svg.call(tool_tip);
 
                   d3.json("jsonfile.json").then(function(data)
@@ -49,6 +49,8 @@
                                           return i *  (w / data.length);  //Bar width of 20 plus 1 for padding
                                         })
                                      .attr("fill", "teal")
+                                     .on('mouseover', tool_tip.show)
+                                     .on('mouseout', tool_tip.hide);
                 })
 
         </script>
