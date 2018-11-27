@@ -3,17 +3,10 @@
     <head>
         <meta charset="utf-8">
         <script type="text/jscript" src="d3/d3.js">
+        <script src="d3-tip.js">
+        <script src="https://d3js.org/d3.v4.js">
         </script>
         <style type="text/css">
-
-          div.bar {
-          display: inline-block;
-          width: 10px;
-          height: 150px;
-          margin-right: 2px;
-          background-color: teal;
-          }
-
         </style>
     </head>
     <body>
@@ -22,21 +15,41 @@
                   d3.select("body").append("h1").text("Educational rate");
                   d3.select("body").append("p").text("Quinten Beker, 12444057");
 
+                  //Width and height
+                  var w = 800;
+                  var h = 300;
+                  var barPadding = 1;
+
+                  var svg = d3.select("body")
+                              .append("svg")
+                              .attr("width", w)
+                              .attr("height", h)
+                              .append("g");
+
+                  var tool_tip = d3.tip()
+                       .attr("class", "d3-tip")
+                       .offset([-8, 0])
+                       .html(function(d) { return "Radius: " + d; });
+                     svg.call(tool_tip);
 
                   d3.json("jsonfile.json").then(function(data)
                   {
-                    console.log(data);
-                    d3.select("body").selectAll("div")
-                    .data(data)
-                    .enter()
-                    .append("div")
-                    .attr("class", "bar")
-                    .style("height", function(d) {
-                      var barHeight = d.value * 2
-                      console.log(d.value);
-                    return barHeight + "px";
-                  });
-                  });
+                    var rects = svg.selectAll("rect")
+                                     .data(data)
+                                     .enter()
+                                     .append("rect")
+                                     .attr("y", function(d) {
+                                      return h - d.value *3;  //Height minus data value
+                                      })
+                                     .attr("width", w / data.length - barPadding)
+                                     .attr("height", function(d) {
+                                      return d.value * 3;  //Just the data value
+                                      })
+                                     .attr("x", function(d, i) {
+                                          return i *  (w / data.length);  //Bar width of 20 plus 1 for padding
+                                        })
+                                     .attr("fill", "teal")
+                })
 
         </script>
     </body>
