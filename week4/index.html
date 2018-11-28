@@ -18,7 +18,6 @@
           color: #fff;
           border-radius: 2px;
         }
-
         /* Creates a small triangle extender for the tooltip */
         .d3-tip:after {
           box-sizing: border-box;
@@ -31,7 +30,6 @@
           position: absolute;
           text-align: center;
         }
-
         /* Style northward tooltips differently */
         .d3-tip.n:after {
           margin: -1px 0 0 0;
@@ -43,48 +41,91 @@
     <body>
         <script type="text/jscript">
                   d3.select("head").append("title").text("Data visualization");
-                  d3.select("body").append("h1").text("Educational rate");
-                  d3.select("body").append("p").text("Quinten Beker, 12444057");
+                  d3.select("body").append("h1").text("Percentage educational rate");
+                  d3.select("body").append("p").text("Quinten Becker, 12444057");
 
-                  //Width and height
+                  //declaring variables width, height, margins for axes, and values
                   var w = 800;
-                  var h = 250;
+                  var h = 350;
+                  var marginHeight = 20;
+                  var marginLeft = 20;
+                  var marginbottom = 20;
                   var barPadding = 1;
+                  var countries = 41;
+                  var max_value = 71.69398;
 
+                  // make svg (canvas)
                   var svg = d3.select("body")
                               .append("svg")
                               .attr("width", w)
                               .attr("height", h)
                               .append("g");
 
-
+                  // tooltip box that presents each data
                   var tool_tip = d3.tip()
                        .attr("class", "d3-tip")
                        .offset([-8, 0])
                        .html(function(d) { return  d.country + ": " + d.value;  });
                      svg.call(tool_tip);
 
+                  var colour = d3.select('body').append('div')
+                    .style("display", "true")
+                    .style("fill", '#99e499')
+
+                    // import Json file as 'data'
                   d3.json("jsonfile.json").then(function(data)
                   {
+
+                    // scale x and y axis to boxplot data and given marges
+                    var yScale = d3.scaleLinear()
+                      .range([h - marginHeight, 0 + marginbottom])
+                      .domain([0, max_value])
+
+
+                    var xScale = d3.scaleLinear()
+                      .range([marginLeft, w])
+                      .domain([0, countries])
+
+                      // This is fot the x-axis, it works, but I left it out because it isn't important in my barchart
+                    // var xAxis = svg.append('g')
+                    //     .attr("transform", "translate(" + "0" + "," + (h - marginbottom) +")")
+                    //     .call(d3.axisBottom(xScale))
+
+                      // make Y-axe
+                    var yAxis = svg.append("g")
+                        .attr("transform", "translate(20," + "0" + ")")
+                        .call(d3.axisLeft(yScale));
+
+                      // make boxplot
                     var rects = svg.selectAll("rect")
                                      .data(data)
                                      .enter()
                                      .append("rect")
                                      .attr("y", function(d) {
-                                      return h - d.value *3;  //Height minus data value
+                                      return yScale(d.value);  //Height minus data value
                                       })
                                      .attr("width", w / data.length - barPadding)
                                      .attr("height", function(d) {
-                                      return d.value * 3;  //Just the data value
+                                      return h - yScale(d.value) - marginbottom;  //Just the data value
                                       })
                                      .attr("x", function(d, i) {
-                                          return i *  (w / data.length);  //Bar width of 20 plus 1 for padding
+                                          return xScale(i);  //Bar width of 20 plus 1 for padding
                                         })
                                      .attr("fill", "teal")
                                      .on('mouseover', tool_tip.show)
-                                     .on('mouseout', tool_tip.hide);
-                })
+                                     .on('mouseenter', function(d){
+                                       // tool_tip.show;
+                                       colour.html(d)
+                                       d3.select(this).style('fill', "maroon")
 
+                                     })
+
+                                     .on('mouseout', tool_tip.hide)
+                                     .on('mouseout', function(d){
+                                       colour.transition()
+                                       d3.select(this).style('fill', "teal")
+                                     })
+                })
         </script>
     </body>
 </html>
