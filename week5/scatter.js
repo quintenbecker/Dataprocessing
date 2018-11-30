@@ -5,12 +5,18 @@ window.onload = function() {
   var requests = d3.json(consConf);
 
   Promise.resolve(requests).then(function(data) {
-      console.log(transformResponse(data));
+      var data = transformResponse(data);
+
+      keys = Object.values(data)
+      console.log(keys)
   }).catch(function(e){
       throw(e);
-
   });
+
 };
+// var years = []
+// keys = Object.values(data)
+// console.log(keys)
 
 function transformResponse(data){
 
@@ -66,6 +72,8 @@ strings.forEach(function(string){
         }
     });
 });
+
+
 
 // return the finished product!
 return dataArray;
