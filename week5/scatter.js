@@ -6,17 +6,34 @@ window.onload = function() {
 
   Promise.resolve(requests).then(function(data) {
       var data = transformResponse(data);
-
+      // console.log(data)
+      getData(data)
       keys = Object.values(data)
-      console.log(keys)
+
+      var years = []
   }).catch(function(e){
       throw(e);
   });
 
 };
-// var years = []
-// keys = Object.values(data)
-// console.log(keys)
+
+function getData(data){
+
+  var dict = {}
+
+  for (var i=0; i<data.length; i++){
+
+    if (dict[data[i]["time"]] == undefined){
+      dict[data[i]["time"]] = [];
+    }
+
+    var temp = [data[i]["Country"], data[i]["datapoint"]]
+
+    dict[data[i]["time"]].push(temp)
+    };
+
+    console.log(dict)
+}
 
 function transformResponse(data){
 
@@ -78,3 +95,27 @@ strings.forEach(function(string){
 // return the finished product!
 return dataArray;
 }
+// var years = []
+// keys = Object.values(data)
+// console.log(keys)
+
+
+// dict[data[i]["time"]] = []
+// dict[data[i]["time"]].push([data[i]["Country"], data[i]["datapoint"])
+//
+// dict{time}:
+
+  // for (var i = 0; i<time.length; i++){
+  //   countries.push(value[i])
+  //   countries.push(datapoint[i]);
+  //   countries.push(time[i]);
+  //   dataset.push([countries]);
+  //   countries = []
+  //
+  // };
+
+  //   console.log(dataset)
+  // value.push(data[i]["Country"])
+  // datapoint.push(data[i]["datapoint"])
+  // time.push(data[i]["time"])
+  // dict[data[i]["time"]] = data[i]["datapoint"], data[i]["Country"];
