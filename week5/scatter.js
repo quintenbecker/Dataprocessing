@@ -1,41 +1,66 @@
 window.onload = function() {
 
   var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
+  var womenInScience = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015"
 
-  var requests = d3.json(consConf);
+  var requests = [d3.json(consConf), d3.json(womenInScience)];
 
-  Promise.resolve(requests).then(function(data) {
-      var data = transformResponse(data);
-      // console.log(data)
-      getData(data)
-      keys = Object.values(data)
+  Promise.all(requests).then(function(data) {
+      var data1 = transformResponse(data[0]);
+      var data2 = transformResponse(data[1]);
+      makeSvg()
 
-      var years = []
+      console.log(data2)
+      console.log(data1);
+      // console.log(data2[1]["time"])
+
+      // getData(data1);
+
+      var complete_data = {}
+      //
+      for (var i = 0; i < data2.length; i++){
+        for (var j = 0; j < data1.length; j++){
+          if (data2[i]["country"] == data1[j]["Country"] && data2[i]["time"] == data1[j]["time"]){
+                if (complete_data[data2[i]["time"]] == undefined){
+                  complete_data[data2[i]["time"]] = []
+                }
+                complete_data[data2[i]["time"]].push([data2[i]["country"], data2[i]["datapoint"], data1[i]["datapoint"]]);
+              }
+            }
+          }
+          console.log(complete_data)
+
   }).catch(function(e){
       throw(e);
   });
-
 };
 
-function getData(data){
+var w = 500;
+var h = 300;
 
-  var dict = {}
 
-  for (var i=0; i<data.length; i++){
+function makeSvg(){
 
-    if (dict[data[i]["time"]] == undefined){
-      dict[data[i]["time"]] = [];
-    }
-
-    var temp = [data[i]["Country"], data[i]["datapoint"]]
-
-    dict[data[i]["time"]].push(temp)
-    };
-
-    console.log(dict)
+  var svg = d3.select("body")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", h);
 }
 
+
+function scatterPlot(data){
+
+  svg.selectAll("circle")
+     .data(dict.value[1])
+     .enter()
+     .append("circle")
+
+}
+
+
+
 function transformResponse(data){
+  t=data
 
 // access data property of the response
 let dataHere = data.dataSets[0].series;
@@ -85,6 +110,7 @@ strings.forEach(function(string){
             // every datapoint has a time and ofcourse a datapoint
             tempObj["time"] = obs.name;
             tempObj["datapoint"] = data[0];
+            tempObj["country"] = t.structure.dimensions.series[1].values[Number(string.slice(-1))].name;
             dataArray.push(tempObj);
         }
     });
@@ -119,3 +145,38 @@ return dataArray;
   // datapoint.push(data[i]["datapoint"])
   // time.push(data[i]["time"])
   // dict[data[i]["time"]] = data[i]["datapoint"], data[i]["Country"];
+
+
+
+  //
+  // function getData(data1, data2){
+  //
+  //   var complete_data = {}
+  //   //
+  //   for (var i = 0; i < data2.length; i++){
+  //     for (var j = 0; j < data1.length; j++){
+  //       if (data2[i]["country"] == data1[j]["Country"] && data2[i]["time"] == data1[j]["time"]){
+  //             if (complete_data[data2[i]["time"]] == undefined){
+  //               complete_data[data2[i]["time"]] = []
+  //             }
+  //             complete_data[data2[i]["time"]].push([data2[i]["country"], data2[i]["datapoint"], data1[i]["datapoint"]]);
+  //           }
+  //         }
+  //       }
+  //       console.log(complete_data)
+
+    // var dict = {}
+    //
+    // for (var i=0; i<data.length; i++){
+    //
+    //   if (dict[data[i]["time"]] == undefined){
+    //     dict[data[i]["time"]] = [];
+    //   }
+    //
+    //   var temp = [data[i]["Country"], data[i]["datapoint"]]
+    //
+    //   dict[data[i]["time"]].push(temp)
+    //   };
+    //
+    //   console.log(dict)
+    // }
