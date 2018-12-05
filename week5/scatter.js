@@ -1,3 +1,6 @@
+var makeScatter;
+var updateScatter;
+
 window.onload = function() {
 
   var consConf = "http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015"
@@ -8,14 +11,9 @@ window.onload = function() {
   Promise.all(requests).then(function(data) {
       var data1 = transformResponse(data[0]);
       var data2 = transformResponse(data[1]);
-      makeSvg()
+      svg = makeSvg()
 
-      console.log(data2)
-      console.log(data1);
-      // console.log(data2[1]["time"])
-
-      // getData(data1);
-
+      // convert data from sites to data parsed in lists (in dictionaries)
       var complete_data = {}
       //
       for (var i = 0; i < data2.length; i++){
@@ -28,36 +26,138 @@ window.onload = function() {
               }
             }
           }
-          console.log(complete_data)
+
+      console.log(complete_data)
+
+      // make dictionary with country and their 'rgb' color
+      var countries = {
+        France: "123,197,87",
+        Germany: "220,194,46",
+        Korea: "150,96,197",
+        Netherlands: "222,80,164",
+        Portugal: "41,117,209",
+        UK: "0,0,0"
+      }
+      // variables of canvas and values
+      var marginHeight = 20;
+      var marginLeft = 20;
+      var marginbottom = 20;
+      var padding = 10
+      var xMax = 50
+      var xMin = 0
+      var yMax = 150
+      var yMin = 80
+
+      // scales scatterplot to y axis
+      var yScale = d3.scaleLinear()
+        .range([h - marginHeight, 0 + marginbottom])
+        .domain([yMin, yMax]);
+
+        // scales scatterplot to x axis
+      var xScale = d3.scaleLinear()
+        .range([marginLeft, w-padding])
+        .domain([xMin, xMax]);
+
+      dropdown = Object.values(complete_data)
+
+
+// makes scatteplot
+makeScatter = function(year){
+
+  svg.selectAll("circle").remove().exit();
+
+  var scatter = svg.selectAll("circle")
+                   .data(dropdown[year-2007])
+                   .enter()
+                   .append("circle")
+                   .attr("cx", function(d) {
+                      return xScale(d[1]);
+                      })
+                   .attr("cy", function(d) {
+                      return yScale(d[2]);
+                      })
+                   .attr("r", 10)
+                   .attr("fill", function(d){
+                     return "rgb(" + countries[(d[0])] + ")";
+                     });
+
+}
+// append name of y axis
+svg.append("text")
+.attr("class", "ytext")
+.attr("x", 50)
+.attr("y", 40)
+.attr("text-anchor", "right")
+.text("% of women in science from total amount of researchers");
+// .attr("transform", "rotate (-90)")
+
+// append name of x axis
+svg.append("text")
+.attr("class", "ytext")
+.attr("x", 800)
+.attr("y", 450)
+.attr("text-anchor", "rotate")
+.text("Consumer Confidence");
+
+  // make X-axis
+  var xAxis = svg.append('g')
+   .attr("transform", "translate(" + "5" + "," + (h - marginbottom) +")")
+   .call(d3.axisBottom(xScale))
+
+   // make Y-axis
+  var yAxis = svg.append("g")
+   .attr("transform", "translate(25," + "0" + ")")
+   .call(d3.axisLeft(yScale));
+
+   // make lagenda element
+  var legenda = svg.selectAll(".legenda")
+  .data(Object.keys(countries))
+  .enter().append("g")
+  .attr("class", "legenda")
+  .attr("transform", function(d, i){
+    return "translate(0," + i * 20 +")"
+  });
+
+  // apply rectanglas filles with each colour of country
+  legenda.append("rect")
+  .attr("x", 900)
+  .attr("y", 0)
+  .attr("width", 18)
+  .attr("height", 18)
+  .style("fill", function(d, i){
+    return "rgb(" + Object.values(countries)[i] + ")"
+  });
+
+  // apply text (country) to each rectangle
+  legenda.append("text")
+ .attr("x", 920)
+ .attr("y", 15)
+ .text(function(d) {
+   return d;
+ });
+
 
   }).catch(function(e){
       throw(e);
   });
 };
 
-var w = 500;
-var h = 300;
+  var w = 1000;
+  var h = 500;
 
-
-function makeSvg(){
+  // make svg (canvas) element
+  function makeSvg(){
 
   var svg = d3.select("body")
               .append("svg")
               .attr("width", w)
-              .attr("height", h);
+              .attr("height", h)
+              .attr("transform", "translate(20,0)")
+
+              return svg;
+              // return w;
+              // return h;
 }
-
-
-function scatterPlot(data){
-
-  svg.selectAll("circle")
-     .data(dict.value[1])
-     .enter()
-     .append("circle")
-
-}
-
-
 
 function transformResponse(data){
   t=data
@@ -107,7 +207,7 @@ strings.forEach(function(string){
                 tempObj[varArray[indexi].name] = varArray[indexi].values[s].name;
             });
 
-            // every datapoint has a time and ofcourse a datapoint
+            // every datapoint has a time, country and ofcourse a datapoint
             tempObj["time"] = obs.name;
             tempObj["datapoint"] = data[0];
             tempObj["country"] = t.structure.dimensions.series[1].values[Number(string.slice(-1))].name;
@@ -121,62 +221,3 @@ strings.forEach(function(string){
 // return the finished product!
 return dataArray;
 }
-// var years = []
-// keys = Object.values(data)
-// console.log(keys)
-
-
-// dict[data[i]["time"]] = []
-// dict[data[i]["time"]].push([data[i]["Country"], data[i]["datapoint"])
-//
-// dict{time}:
-
-  // for (var i = 0; i<time.length; i++){
-  //   countries.push(value[i])
-  //   countries.push(datapoint[i]);
-  //   countries.push(time[i]);
-  //   dataset.push([countries]);
-  //   countries = []
-  //
-  // };
-
-  //   console.log(dataset)
-  // value.push(data[i]["Country"])
-  // datapoint.push(data[i]["datapoint"])
-  // time.push(data[i]["time"])
-  // dict[data[i]["time"]] = data[i]["datapoint"], data[i]["Country"];
-
-
-
-  //
-  // function getData(data1, data2){
-  //
-  //   var complete_data = {}
-  //   //
-  //   for (var i = 0; i < data2.length; i++){
-  //     for (var j = 0; j < data1.length; j++){
-  //       if (data2[i]["country"] == data1[j]["Country"] && data2[i]["time"] == data1[j]["time"]){
-  //             if (complete_data[data2[i]["time"]] == undefined){
-  //               complete_data[data2[i]["time"]] = []
-  //             }
-  //             complete_data[data2[i]["time"]].push([data2[i]["country"], data2[i]["datapoint"], data1[i]["datapoint"]]);
-  //           }
-  //         }
-  //       }
-  //       console.log(complete_data)
-
-    // var dict = {}
-    //
-    // for (var i=0; i<data.length; i++){
-    //
-    //   if (dict[data[i]["time"]] == undefined){
-    //     dict[data[i]["time"]] = [];
-    //   }
-    //
-    //   var temp = [data[i]["Country"], data[i]["datapoint"]]
-    //
-    //   dict[data[i]["time"]].push(temp)
-    //   };
-    //
-    //   console.log(dict)
-    // }
