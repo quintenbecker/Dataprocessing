@@ -2,14 +2,46 @@
 <HEAD>
   <script type="text/javascript" src="d3/d3.js"></script>
   <script src="d3/d3-tip.js"></script>
-  <script src="linked.js"></script>
+  <script src="linked.js"></script><style type="text/css">
+  body {
+    font: 12px sans-serif;
+  }
+  .d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+  }
+  /* Creates a small triangle extender for the tooltip */
+  .d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+  }
+  /* Style northward tooltips differently */
+  .d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+  }
+  </style>
 
 
 <Title> Data Visualisatie </Title>
 <h1> Linked Vieuws </h1>
 <p1> Quinten Becker, 12444059 </p1>
+<p2>
 <a href="https://data.oecd.org/eduatt/adult-education-level.htm">
-  Dataset Education Level</a><br>
+  Dataset: Education Level</a><br>
+  </p2>
 </HEAD>
 <BODY>
   <div>
