@@ -1,7 +1,9 @@
 var svgBars;
+var svgPie;
 
 window.onload = function() {
 svgBars = makeSvg()
+svgPie = makeSvgPie()
 
 
 
@@ -13,37 +15,47 @@ svgBars = makeSvg()
   // make svg (canvas) element
   function makeSvg(){
 
-  var svg = d3.select("body")
+  var barSvg = d3.select("body")
               .append("svg")
               .attr("width", w)
               .attr("height", h)
               // .attr("transform", "translate(20,0)")
 
-              return svg;
+              return barSvg;
+}
 
+var width = 500;
+var height = 350;
+
+// make svg (canvas) element
+  function makeSvgPie(){
+
+  var pieSvg = d3.select("body")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height)
+              .style("background", "grey")
+              return pieSvg;
 }
 
 d3.json("jsonfile.json").then(function(data)
 {
-  // console.log(data)
 
+  countriesList = []
   countries = Object.keys(data)
-  console.log(countries);
-
 
   totalList = []
   totals = Object.values(data)
   totals.forEach(function(d){
-  totalList.push(d.Total)
+    totalList.push(d.Total)
+  })
 
-
-})
-barchart(totalList)
+barchart(totalList, countries)
 
 });
 
 
-  function barchart(t){
+  function barchart(t, b){
 
     var w = 700;
     var h = 350;
@@ -59,26 +71,28 @@ barchart(totalList)
       .range([h - marginHeight, 0 + marginbottom])
       .domain([0, yMax])
 
+    var tool_tip = d3.tip()
+         .attr("class", "d3-tip")
+         .offset([-8, 0])
+         .html(function(d, i) { return b[i] + ": "+ d});
+    svgBars.call(tool_tip);
 
-    var xScale = d3.scaleLinear()
+
+    var xScale = d3.scaleBand()
       .range([w, marginLeft])
-      .domain([0, countries])
+      .domain(b)
 
-    // var xAxis = svgBars.append('g')
-    //       .attr("transform", "translate(" + "0" + "," + (h - marginbottom) +")")
-    //       .call(d3.axisBottom(xScale))
+    var xAxis = svgBars.append('g')
+          .attr("transform", "translate(" + "0" + "," + (h - marginbottom) +")")
+          .call(d3.axisBottom(xScale))
+          .style("font-size", "6px")
 
         // make Y-axe
     var yAxis = svgBars.append("g")
           .attr("transform", "translate(20," + "0" + ")")
           .call(d3.axisLeft(yScale));
 
-    // var tool_tip = d3.tip()
-    //      .attr("class", "d3-tip")
-    //      .offset([-8, 0])
-    //      .html(function(d) { return  d.country + ": " + d.value;  });
-    //    svg.call(tool_tip);
-    
+
     var colour = d3.select('body').append('div')
       .style("display", "true")
       .style("fill", '#99e499')
@@ -90,11 +104,12 @@ barchart(totalList)
                    .data(t)
                    .enter()
                    .append("rect")
+                   .attr("class", "bar")
                    .attr("y", function(d) {
                     return yScale(d);
                     })
                    .attr("x", function(d, i) {
-                         return xScale(i);
+                         return xScale(b[i]);
                        })
                    .attr("width", (w / t.length) - barPadding)
                    .attr("height", function(d) {
@@ -102,14 +117,6 @@ barchart(totalList)
                     })
 
                    .attr("fill", "teal")
-                   .on('mouseenter', function(d){
-                     // tool_tip.show;
-                     colour.html(d)
-                     d3.select(this).style('fill', "maroon")
-                   })
-                   .on('mouseout', function(d){
-                     colour.transition()
-                     d3.select(this).style('fill', "teal")
-                   })
+                   .on('mouseover', tool_tip.show)
                    .on('mouseout', tool_tip.hide)
 }
